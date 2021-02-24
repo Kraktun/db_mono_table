@@ -15,8 +15,71 @@ Note that the values are mapped in order (i.e. i-th value in the json from the A
 
 The frontend relies on an API whose structure is as follows:
 
+```(bash)
+/api/v1/login
+
+    POST
+        with json payload
+            {
+                "user": String
+                "password": String
+            }
+
+        Returns
+            401 if wrong combination user & password
+            
+            202 if accepted and 
+                {
+                    "token": String
+                }
 ```
-TODO
+
+```(bash)
+/api/v1/logout
+
+    POST
+        with header 
+            'Authorization': 'Bearer $token'
+    
+        Returns 
+            401 if not authorized
+            200 if authorized
+```
+
+```(bash)
+/api/v1/objects
+
+    GET
+        with header 
+            'Authorization': 'Bearer $token'
+        with optional query string
+            search=String
+    
+        Returns 
+            401 if not authorized
+
+            200 if authorized and 
+                [
+                    {
+                        "name": String,
+                        "description": String,
+                        "quantity": String,
+                        "TAG": String,
+                        "box": String,
+                        "place": String
+                    },
+                    {
+                        "name": String,
+                        "description": String,
+                        "quantity": String,
+                        "TAG": String,
+                        "box": String,
+                        "place": String
+                    }
+                ]
+                always an array, even if a single object or none. 
+                The names of the fields are not relevant as they are mapped according to their position.
+
 ```
 
 ## License

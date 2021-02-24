@@ -8,7 +8,7 @@ import 'package:db_mono_table/utils.dart';
 import 'package:db_mono_table/consts.dart';
 
 
-// Original from https://github.com/putraxor/flutter-login-ui
+// Original from https://github.com/putraxor/flutter-login-ui under public domain
 
 
 class LoginPage extends StatefulWidget {
