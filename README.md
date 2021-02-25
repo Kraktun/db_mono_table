@@ -11,6 +11,10 @@ It supports login/logout, columns filtering, columns sorting and backend searche
 To change the structure of the table displayed it's sufficient to change the variable ```COLUMNS``` in ```table_object.dart``` with the values provided by the backend.
 Note that the values are mapped in order (i.e. i-th value in the json from the API is mapped to the i-th column). The last value from the json is used as a boxtip for the last column.
 
+## Example
+
+<img src="screen/sample.gif" width="720" height="492" />
+
 ## API
 
 The frontend relies on an API whose structure is as follows:
