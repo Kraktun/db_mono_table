@@ -4,6 +4,7 @@ import 'package:db_mono_table/utils.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:db_mono_table/table_object.dart';
 import 'package:db_mono_table/http_utils.dart';
+import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 
 class TablePage extends StatefulWidget {
   static const String ROUTE = 'table-page';
@@ -27,8 +28,10 @@ class _TablePageState extends State<TablePage> {
   int _sortColumnIndex = 0;
 
   /// Layout vars
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollVertController = ScrollController();
+  final ScrollController _scrollHorController = ScrollController();
   final GlobalKey<ScaffoldState> _mainKey = new GlobalKey<ScaffoldState>();
+  double _heightScroller = 48;
 
   /// Search vars
   Icon _searchIcon = Icon(Icons.search);
@@ -93,6 +96,22 @@ class _TablePageState extends State<TablePage> {
           ),
         ))).toList()
     );
+    // The DraggableScrollbar captures also the horizontal scroll (but displays it as vertical)
+    // So we set the height to 0 whenever we are scrolling horizontally and restore it when we scroll vertically
+    _scrollHorController.addListener(() {
+      if (_heightScroller > 0) {
+        setState(() {
+          _heightScroller = 0;
+        });
+      }
+    });
+    _scrollVertController.addListener(() {
+      if (_heightScroller < 48) {
+        setState(() {
+          _heightScroller = 48;
+        });
+      }
+    });
   }
 
   @override
@@ -207,21 +226,24 @@ class _TablePageState extends State<TablePage> {
         appBar: appBar,
         body: SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: Scrollbar(
-            controller: _scrollController,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              controller: _scrollController,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                controller: _scrollController,
-                child: Container(
-                  constraints: BoxConstraints(
-                    minWidth: MediaQuery.of(context).size.width,
+          child: DraggableScrollbar.rrect(
+            controller: _scrollVertController,
+            heightScrollThumb: _heightScroller,
+            child: ListView.builder(
+              controller: _scrollVertController,
+              itemCount: 1,
+              itemBuilder: (context, index) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _scrollHorController,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minWidth: MediaQuery.of(context).size.width,
+                    ),
+                    child: table, // should be changed with expandable tiles
                   ),
-                  child: table, // should be changed with expandable tiles
-                ),
-              ),
+                );
+              }
             ),
           ),
         ),
