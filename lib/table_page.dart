@@ -36,7 +36,9 @@ class _TablePageState extends State<TablePage> {
   /// Search vars
   Icon _searchIcon = Icon(Icons.search);
   Widget _searchTitle = Text("Search");
+  final FocusNode _searchFocusNode = FocusNode();
   final TextEditingController _searchController = TextEditingController();
+  bool _searchExecuted = false; // tracks if a proper search was executed and values need to be fetched again from server
 
   /// Filter vars
   // controllers for the filters
@@ -75,9 +77,10 @@ class _TablePageState extends State<TablePage> {
       // populate table
       _populateTable(false).then((value) =>
         // sort table
-      _sortTable().then(
-        // remove loading screen
-        (v) => Navigator.pop(context)),
+        _sortTable().then(
+          // remove loading screen
+          (v) => Navigator.pop(context)
+        ),
       ),
     });
     // add filters listener to the controllers
@@ -116,9 +119,11 @@ class _TablePageState extends State<TablePage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollVertController.dispose();
+    _scrollHorController.dispose();
     _searchController.dispose();
     _filterControllers.forEach((element) => element.dispose());
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -144,32 +149,43 @@ class _TablePageState extends State<TablePage> {
           this._searchIcon = Icon(Icons.close);
           this._searchTitle = TextField(
             controller: _searchController,
+            focusNode: _searchFocusNode,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search, color: Colors.black,),
                 hintText: 'Search...'
             ),
             textInputAction: TextInputAction.search,
             onSubmitted: (value) {
-              showLoadingScreen(context);
-              // load data filtered from server according to search
-              _populateTable(true).then((value) => {
+              if (_searchController.text.isNotEmpty) {
+                _searchExecuted = true;
+                showLoadingScreen(context);
+                // load data filtered from server according to search
+                _populateTable(true).then((value) =>
+                {
                   // apply local filters
                   _applyFilters(false).then((value) => Navigator.pop(context)),
-                  }
-              );
+                }
+                );
+              }
             },
           );
+          _searchFocusNode.requestFocus();
         } else {
           // clean search textfield and reload table with all data from server and applies local filters
-          showLoadingScreen(context);
           this._searchIcon = Icon(Icons.search);
           this._searchTitle = Text("Search");
           _searchController.clear();
-          _populateTable(false).then((value) => {
+          if (_searchExecuted) {
+            // reload data only if an actual search was performed
+            _searchExecuted = false;
+            showLoadingScreen(context);
+            _populateTable(false).then((value) =>
+            {
               // apply local filters
               _applyFilters(false).then((value) => Navigator.pop(context)),
             }
-          );
+            );
+          }
         }
       });
     }

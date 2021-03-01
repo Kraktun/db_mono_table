@@ -2,7 +2,7 @@
 
 Site to visualize a db in a single table view.
 
-This is a simple project made by writing things during my spare time, so don't expect any real structure behind it. 
+This is a simple project made by writing things during my spare time, so don't expect any real structure behind it.
 
 This is meant to be used primarily on touchscreen panels so support for scrolling with a mouse is limited.
 
